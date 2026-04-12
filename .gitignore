@@ -16,3 +16,11 @@ Thumbs.db
 
 # Output
 *.log
+
+# Data directories — 分析产物由各子目录 .gitignore 管理
+# 以下为双重保险，防止子目录 .gitignore 被误删后泄漏大文件
+data/earnings-pdf/*.pdf
+data/earnings-extracted/**/
+data/earnings-analysis/**/
+data/market-data/**/
+data/valuation-reports/**/

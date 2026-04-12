@@ -1,0 +1,8 @@
+# 忽略所有提取结果文件
+*.md
+*.json
+# 忽略按公司组织的子目录
+*/
+# 保留 .gitkeep 和 .gitignore
+!.gitkeep
+!.gitignore

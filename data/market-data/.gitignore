@@ -1,0 +1,9 @@
+# 忽略所有行情数据和报告文件
+*.json
+*.md
+*.pdf
+# 忽略按公司组织的子目录
+*/
+# 保留 .gitkeep 和 .gitignore
+!.gitkeep
+!.gitignore

@@ -1,0 +1,9 @@
+# 忽略所有估值分析结果文件
+*.json
+*.md
+*.png
+# 忽略按公司组织的子目录
+*/
+# 保留 .gitkeep 和 .gitignore
+!.gitkeep
+!.gitignore
