@@ -63,7 +63,17 @@ def _fmt_num(val, decimals=2, suffix="", fallback="-"):
 
 
 def _fmt_pct(val, decimals=2, fallback="-"):
-    return _fmt_num(val, decimals=decimals, suffix="%", fallback=fallback)
+    """Format percentage — auto-convert decimal form (0.08 -> 8.00%)."""
+    if val is None:
+        return fallback
+    try:
+        v = float(val)
+    except (TypeError, ValueError):
+        return fallback
+    # If value looks like a decimal ratio (< 1 and > -1), convert to pct
+    if -1 < v < 1 and v != 0:
+        v = v * 100
+    return _fmt_num(v, decimals=decimals, suffix="%", fallback=fallback)
 
 
 def _fmt_price(val, decimals=2, fallback="-"):
@@ -400,14 +410,14 @@ class ReportBuilder:
         self.output_dir = output_dir
         self.visualizer = visualizer or ValuationVisualizer()
 
-        # Commonly needed fields
-        self.code = (self.integrated.get("code")
-                     or self.data.get("code")
-                     or self.preprocessed.get("code")
+        # Commonly needed fields — navigate into "meta" sub-dict
+        self.code = (_safe_get(self.integrated, "meta", "code")
+                     or _safe_get(self.data, "meta", "code")
+                     or _safe_get(self.preprocessed, "meta", "code")
                      or "000000")
-        self.name = (self.integrated.get("name")
-                     or self.data.get("name")
-                     or self.preprocessed.get("name")
+        self.name = (_safe_get(self.integrated, "meta", "name")
+                     or _safe_get(self.data, "meta", "name")
+                     or _safe_get(self.preprocessed, "meta", "name")
                      or "\u672a\u77e5\u516c\u53f8")
         self.price = self._find_price()
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -420,12 +430,14 @@ class ReportBuilder:
                 v = _safe_get(src, key)
                 if v is not None:
                     return float(v)
-            v = _safe_get(src, "basic_snapshot", "current_price")
-            if v is not None:
-                return float(v)
-            v = _safe_get(src, "market_data", "current_price")
-            if v is not None:
-                return float(v)
+            # Search in common nested structures
+            for path in [("basic_snapshot", "current_price"),
+                         ("market_data", "current_price"),
+                         ("real_time", "price"),
+                         ("real_time_snapshot", "price")]:
+                v = _safe_get(src, *path)
+                if v is not None:
+                    return float(v)
         return None
 
     def _get_snapshot_field(self, *keys, default=None):
@@ -434,17 +446,19 @@ class ReportBuilder:
                 v = _safe_get(src, key)
                 if v is not None:
                     return v
-                v = _safe_get(src, "basic_snapshot", key)
-                if v is not None:
-                    return v
-                v = _safe_get(src, "market_data", key)
-                if v is not None:
-                    return v
+                # Search in common nested paths
+                for prefix in ("basic_snapshot", "market_data",
+                               "real_time", "real_time_snapshot"):
+                    v = _safe_get(src, prefix, key)
+                    if v is not None:
+                        return v
         return default
 
     def _get_mode(self):
         mode = (_safe_get(self.integrated, "mode")
-                or _safe_get(self.preprocessed, "mode"))
+                or _safe_get(self.integrated, "meta", "mode")
+                or _safe_get(self.preprocessed, "mode")
+                or _safe_get(self.preprocessed, "meta", "mode"))
         if mode is None:
             return "A", "\u6807\u51c6\u4f30\u503c\u6d41\u7a0b"
         mode_str = str(mode).upper()
@@ -481,6 +495,7 @@ class ReportBuilder:
         return (_safe_get(self.integrated, "confidence_level")
                 or _safe_get(self.integrated, "confidence")
                 or _safe_get(self.preprocessed, "confidence_level")
+                or _safe_get(self.preprocessed, "meta", "confidence")
                 or "-")
 
     def _get_models_summary(self):
@@ -492,7 +507,10 @@ class ReportBuilder:
         models = []
         skipped = []
 
+        # integrated may have model data under "valuation_matrix.models"
+        # model_results JSON has top-level "model_results" key wrapping actual models
         results = (_safe_get(self.integrated, "model_results")
+                   or _safe_get(self.model_results, "model_results")
                    or self.model_results)
 
         def _parse_model(key, val):

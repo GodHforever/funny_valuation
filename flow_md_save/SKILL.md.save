@@ -184,10 +184,23 @@ python ~/.claude/skills/china-earnings-lite/scripts/earnings_lite.py \
 
 **步骤 4.2 — 宏观经济数据（并行执行）：**
 ```bash
+# 利率数据
 python ~/.claude/skills/china-macro-lite/scripts/macro_lite.py \
     --category 利率 \
     --output-dir data/market-data/{code}/
+
+# 通胀数据（CPI/PPI）
+python ~/.claude/skills/china-macro-lite/scripts/macro_lite.py \
+    --category 通胀 \
+    --output-dir data/market-data/{code}/
+
+# 货币供应（M1/M2，如该类别可用）
+python ~/.claude/skills/china-macro-lite/scripts/macro_lite.py \
+    --category 货币 \
+    --output-dir data/market-data/{code}/
 ```
+
+> 注：宏观数据获取失败不阻塞流程，Stage 5 会使用默认假设。
 
 **产出：**
 - `data/market-data/{code}/{code}_*.json` — 财务数据（利润表、资产负债表、现金流量表）
@@ -285,6 +298,18 @@ python .claude/skills/financial-statement-based-workflow/stock-valuation/scripts
 引导用户查看各阶段的详细报告文件路径。
 
 ---
+
+## 数据单位约定
+
+各 Stage 脚本统一使用以下单位，确保数据流兼容：
+
+| 数据项 | 单位 | 说明 |
+|--------|------|------|
+| 股价 | 元 | push2 API 原始值需 /100 |
+| PE/PB/PS | 倍 | push2 API 原始值需 /100 |
+| 市值 | 亿元 | push2 API f116 以元为单位，需 /1e8 |
+| 营收/利润 | 亿元 | 财务报表数据需 /1e8 |
+| WACC/利率 | 小数 | 如 0.08 表示 8%，报告展示时自动转换 |
 
 ## 错误处理与降级策略
 

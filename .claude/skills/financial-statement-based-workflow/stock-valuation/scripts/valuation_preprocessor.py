@@ -1146,7 +1146,20 @@ class EPSForecaster:
         vals = get_values(eps_series)
 
         if len(vals) < 2:
-            self.warnings.append("EPS数据不足，无法进行预测")
+            self.warnings.append("EPS数据不足，无法进行趋势预测")
+            # 回退：使用最新可用 EPS 作为基准（而非返回全 None 导致 PE 模型跳过）
+            if vals:
+                ttm = vals[-1]
+                return {
+                    "trend_type": "insufficient_data",
+                    "trend_type_cn": TREND_TYPE_CN.get("insufficient_data", "数据不足"),
+                    "cagr": None,
+                    "volatility": None,
+                    "pessimistic": round(ttm * 0.8, 2) if ttm > 0 else None,
+                    "base": round(ttm, 2) if ttm > 0 else None,
+                    "optimistic": round(ttm * 1.2, 2) if ttm > 0 else None,
+                    "analyst_comparison": None,
+                }
             return {
                 "trend_type": "insufficient_data",
                 "trend_type_cn": TREND_TYPE_CN.get("insufficient_data", "数据不足"),
@@ -1638,7 +1651,7 @@ class DPSForecaster:
 def parse_qualitative_doc(filepath):
     """
     解析定性分析 Markdown 文档中的评级信息。
-    查找:
+    支持多种格式（严格格式 + 宽松格式）：
       - 业务确定性评级：【高/中高/中/中低/低】
       - 增长可持续性评级：【强/较强/中性/较弱/弱】
       - 研判置信度：【高/中/低】
@@ -1659,23 +1672,46 @@ def parse_qualitative_doc(filepath):
 
     result = {}
 
-    # 业务确定性评级
-    m = re.search(r"业务确定性评级[：:]\s*【(高|中高|中|中低|低)】", content)
-    if m:
-        result["business_certainty"] = m.group(1)
+    # 业务确定性评级 — 多种格式
+    for pat in [
+        r"业务确定性评级[：:]\s*【(高|中高|中|中低|低)】",
+        r"业务确定性[：:]\s*[【\[]?(高|中高|中|中低|低)[】\]]?",
+        r"确定性评级[：:]\s*[【\[]?(高|中高|中|中低|低)[】\]]?",
+        r"\*\*业务确定性\*\*[：:]\s*(高|中高|中|中低|低)",
+    ]:
+        m = re.search(pat, content)
+        if m:
+            result["business_certainty"] = m.group(1)
+            break
 
-    # 增长可持续性评级
-    m = re.search(r"增长可持续性评级[：:]\s*【(强|较强|中性|较弱|弱)】", content)
-    if m:
-        result["growth_sustainability"] = m.group(1)
+    # 增长可持续性评级 — 多种格式
+    for pat in [
+        r"增长可持续性评级[：:]\s*【(强|较强|中性|较弱|弱)】",
+        r"增长可持续性[：:]\s*[【\[]?(强|较强|中性|较弱|弱)[】\]]?",
+        r"可持续性评级[：:]\s*[【\[]?(强|较强|中性|较弱|弱)[】\]]?",
+        r"\*\*增长可持续性\*\*[：:]\s*(强|较强|中性|较弱|弱)",
+    ]:
+        m = re.search(pat, content)
+        if m:
+            result["growth_sustainability"] = m.group(1)
+            break
 
-    # 研判置信度
-    m = re.search(r"研判置信度[：:]\s*【(高|中|低)】", content)
-    if m:
-        result["confidence"] = m.group(1)
+    # 研判置信度 — 多种格式
+    for pat in [
+        r"研判置信度[：:]\s*【(高|中|低)】",
+        r"(?:综合|整体|分析)?置信度[：:]\s*[【\[]?(高|中|低)[】\]]?",
+        r"信号可信度[：:]\s*[【\[]?(高|中|低)[】\]]?",
+        r"\*\*置信度\*\*[：:]\s*(高|中|低)",
+    ]:
+        m = re.search(pat, content)
+        if m:
+            result["confidence"] = m.group(1)
+            break
 
-    # 额外：主要风险解析（兼容旧格式）
-    risks = re.findall(r"风险[A-Za-z]?[：:]\s*(.+?)，影响程度【?(高|中|低)】?", content)
+    # 额外：主要风险解析（兼容多种格式）
+    risks = re.findall(r"风险[A-Za-z0-9]?[：:]\s*(.+?)，影响程度[：:]?\s*[【\[]?(高|中|低)[】\]]?", content)
+    if not risks:
+        risks = re.findall(r"[·\-]\s*(.+?)（影响[：:]?\s*(高|中|低)）", content)
     if risks:
         result["risks"] = [{"description": r[0].strip(), "impact": r[1]} for r in risks]
 

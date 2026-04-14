@@ -135,12 +135,17 @@ def get_stock_info(code):
             d = data["data"]
             info["name"] = d.get("f58", "")
             info["industry"] = d.get("f127", "")
+            # f116/f117 以元为单位, f162/f163/f164/f167 已乘100
             info["market_cap"] = _safe_float(d.get("f116", 0))
             info["circulating_cap"] = _safe_float(d.get("f117", 0))
-            info["pe_ttm"] = _safe_float(d.get("f162", 0))
-            info["pe_static"] = _safe_float(d.get("f167", 0))
-            info["pb"] = _safe_float(d.get("f163", 0))
-            info["ps_ttm"] = _safe_float(d.get("f164", 0))
+            raw_pe = _safe_float(d.get("f162", 0))
+            info["pe_ttm"] = raw_pe / 100 if raw_pe else None
+            raw_pe_s = _safe_float(d.get("f167", 0))
+            info["pe_static"] = raw_pe_s / 100 if raw_pe_s else None
+            raw_pb = _safe_float(d.get("f163", 0))
+            info["pb"] = raw_pb / 100 if raw_pb else None
+            raw_ps = _safe_float(d.get("f164", 0))
+            info["ps_ttm"] = raw_ps / 100 if raw_ps else None
     except Exception as e:
         print(f"  [警告] 获取行情信息失败: {e}", file=sys.stderr)
     return info

@@ -117,8 +117,18 @@ class DCFModel(BaseValuationModel):
 
         base_fcf = safe_get(params, "fcf", "base_fcf", default=0.0)
         if base_fcf is None or base_fcf <= 0:
-            return self._result(self.MODEL_NAME, False,
-                                applicability_note="基础自由现金流 <= 0, 不适用 DCF")
+            # 对于扩张期公司，FCF 可能为负。尝试使用经营现金流作为代理
+            ocf_series = safe_get(params, "fcf", "historical_series", default=[])
+            if ocf_series:
+                # 尝试取最近正值 FCF 的均值
+                positive_fcfs = [item.get("value", 0) for item in ocf_series
+                                 if isinstance(item, dict) and (item.get("value") or 0) > 0]
+                if positive_fcfs:
+                    base_fcf = sum(positive_fcfs) / len(positive_fcfs)
+                    warnings.append("基础FCF<=0，使用历史正值FCF均值({:.2f}亿)作为代理".format(base_fcf))
+            if base_fcf is None or base_fcf <= 0:
+                return self._result(self.MODEL_NAME, False,
+                                    applicability_note="基础自由现金流 <= 0, 不适用 DCF")
 
         fcf_growth = safe_get(params, "fcf", "trend_slope", default=0.08)
         if fcf_growth is None:
@@ -631,8 +641,8 @@ class DDMModel(BaseValuationModel):
         # (1) 连续 3 年分红
         if d1 <= 0:
             fail_reasons.append("D1 <= 0, 缺少连续分红记录")
-        # (2) 派息率波动 < 15pct
-        if payout_stability not in ("stable", "稳定"):
+        # (2) 派息率稳定性（接受 stable 和 moderate）
+        if payout_stability not in ("stable", "moderate", "稳定", "适中"):
             fail_reasons.append(
                 "派息率稳定性不足 (当前: {})".format(payout_stability))
         # (3) OCF / 分红 > 1.2

@@ -698,10 +698,17 @@ def _classify_section(title: str) -> Tuple[str, int]:
     """
     根据标题文本判断属于哪个分类。
     返回 (category_key, priority)。
+    支持复合标题（如"公司治理、环境和社会"同时匹配多个关键词）。
     """
     title_clean = title.strip()
+    # 首先尝试精确匹配
     for cat_key, cat_info in SECTION_CLASSIFICATION.items():
         for kw in cat_info["keywords"]:
+            if kw in title_clean:
+                return cat_key, cat_info["priority"]
+    # 再尝试章节级关键词匹配（更宽松）
+    for cat_key, cat_info in SECTION_CLASSIFICATION.items():
+        for kw in cat_info.get("section_keywords", []):
             if kw in title_clean:
                 return cat_key, cat_info["priority"]
     return "", 0
@@ -1238,7 +1245,12 @@ def run_extraction(
     if target_sections:
         # 用户指定的类别
         to_extract = [s for s in sections if s.category in target_sections]
+        matched_cats = set(s.category for s in to_extract)
+        unmatched_cats = [c for c in target_sections if c not in matched_cats]
         print(f"\n  指定提取类别: {', '.join(target_sections)}")
+        print(f"  匹配成功: {len(matched_cats)}/{len(target_sections)} 个类别")
+        if unmatched_cats:
+            print(f"  未匹配类别: {', '.join(unmatched_cats)}")
     elif all_sections:
         to_extract = sections
         print(f"\n  提取全部 {len(sections)} 个章节")

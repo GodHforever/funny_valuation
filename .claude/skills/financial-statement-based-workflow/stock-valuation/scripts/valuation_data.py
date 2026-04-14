@@ -183,20 +183,24 @@ class RealTimeQuote:
             if not data or not data.get("data"):
                 return result
             d = data["data"]
-            # 价格字段可能需要 /100（部分品种）
-            price = _safe_float(d.get("f43"))
-            if price and price > 10000:
-                price = price / 100
+            # push2 API: f43 以分为单位, f162/f163/f164/f167/f170 已乘100
+            raw_price = _safe_float(d.get("f43"))
+            price = raw_price / 100 if raw_price else None
+            raw_pe = _safe_float(d.get("f162"))
+            raw_pb = _safe_float(d.get("f163"))
+            raw_ps = _safe_float(d.get("f164"))
+            raw_yield = _safe_float(d.get("f167"))
+            raw_change = _safe_float(d.get("f170"))
             result.update({
                 "price": price,
-                "change_pct": _safe_float(d.get("f170")),
+                "change_pct": raw_change / 100 if raw_change else None,
                 "volume": _safe_float(d.get("f47")),
                 "total_market_cap": _safe_div(d.get("f116"), 1e8),  # 转为亿元
                 "circulating_market_cap": _safe_div(d.get("f117"), 1e8),
-                "pe_ttm": _safe_float(d.get("f162")),
-                "pb_mrq": _safe_float(d.get("f163")),
-                "ps_ttm": _safe_float(d.get("f164")),
-                "dividend_yield": _safe_float(d.get("f167")),
+                "pe_ttm": raw_pe / 100 if raw_pe else None,
+                "pb_mrq": raw_pb / 100 if raw_pb else None,
+                "ps_ttm": raw_ps / 100 if raw_ps else None,
+                "dividend_yield": raw_yield / 100 if raw_yield else None,
                 "total_shares": _safe_div(d.get("f55"), 1e8) if d.get("f55") else None,  # 转为亿股
                 "name": d.get("f58", ""),
                 "industry": d.get("f127", ""),
