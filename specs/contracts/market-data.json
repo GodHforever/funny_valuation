@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Market Data",
+  "description": "宏观经济 + 行业数据。macro_lite 输出格式。",
+  "type": "object",
+  "required": ["pull_time", "indicators", "summary"],
+  "properties": {
+    "pull_time": {"type": "string", "description": "数据获取时间"},
+    "indicators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "category", "status"],
+        "properties": {
+          "name": {"type": "string"},
+          "category": {"type": "string"},
+          "value": {"type": ["number", "null"]},
+          "prev_value": {"type": ["number", "null"]},
+          "change": {"type": ["number", "null"]},
+          "unit": {"type": "string"},
+          "data_date": {"type": "string"},
+          "source": {"type": "string"},
+          "status": {"type": "string", "enum": ["success", "failed"]}
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total", "success", "failed"],
+      "properties": {
+        "total": {"type": "integer"},
+        "success": {"type": "integer"},
+        "failed": {"type": "integer"}
+      }
+    }
+  }
+}

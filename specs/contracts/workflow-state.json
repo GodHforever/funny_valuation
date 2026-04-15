@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Workflow State",
+  "description": "工作流执行状态追踪。每次工作流执行产生一个 state.json。",
+  "type": "object",
+  "required": ["workflow", "stock_code", "started_at", "current_phase", "stages"],
+  "properties": {
+    "workflow": {"type": "string", "description": "工作流名称"},
+    "stock_code": {"type": "string"},
+    "stock_name": {"type": "string"},
+    "started_at": {"type": "string", "description": "ISO8601"},
+    "completed_at": {"type": ["string", "null"]},
+    "current_phase": {"type": "string", "description": "当前阶段标识"},
+    "overall_status": {"type": "string", "enum": ["running", "completed", "failed", "blocked"]},
+    "stages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {"type": "string", "enum": ["pending", "running", "passed", "failed", "skipped"]},
+          "started_at": {"type": ["string", "null"]},
+          "completed_at": {"type": ["string", "null"]},
+          "input_files": {"type": "array", "items": {"type": "string"}},
+          "output_files": {"type": "array", "items": {"type": "string"}},
+          "validation": {
+            "type": "object",
+            "properties": {
+              "schema": {"type": "string", "description": "使用的 schema 文件路径"},
+              "result": {"type": "string", "enum": ["pass", "warn", "fail", "skip"]},
+              "errors": {"type": "array", "items": {"type": "string"}},
+              "warnings": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "errors": {"type": "array", "items": {"type": "string"}},
+          "duration_seconds": {"type": ["number", "null"]}
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage": {"type": "string"},
+          "severity": {"type": "string", "enum": ["critical", "warning", "info"]},
+          "message": {"type": "string"},
+          "timestamp": {"type": "string"}
+        }
+      }
+    }
+  }
+}

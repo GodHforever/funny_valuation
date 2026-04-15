@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Valuation Input",
+  "description": "估值预处理输出。preprocessor 产出，供 8 个估值模型使用。",
+  "type": "object",
+  "required": ["meta", "real_time_snapshot", "income_data", "wacc"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["code", "analysis_date", "company_stage"],
+      "properties": {
+        "code": {"type": "string"},
+        "name": {"type": "string"},
+        "analysis_date": {"type": "string"},
+        "mode": {"type": "string", "enum": ["A", "B"]},
+        "company_stage": {"type": "string"},
+        "stage_indicators": {"type": "object"}
+      }
+    },
+    "real_time_snapshot": {
+      "type": "object",
+      "required": ["current_price", "total_market_cap"],
+      "properties": {
+        "current_price": {"type": ["number", "null"]},
+        "total_market_cap": {"type": ["number", "null"]},
+        "total_shares": {"type": ["number", "null"]},
+        "net_debt": {"type": ["number", "null"]},
+        "pe_ttm": {"type": ["number", "null"]},
+        "pb_mrq": {"type": ["number", "null"]},
+        "eps_ttm": {"type": ["number", "null"]},
+        "bvps": {"type": ["number", "null"]}
+      }
+    },
+    "income_data": {"type": "object"},
+    "fcf": {
+      "type": "object",
+      "properties": {
+        "base_fcf": {"type": ["number", "null"]},
+        "trend_slope": {"type": ["number", "null"]},
+        "historical_series": {"type": "array"}
+      }
+    },
+    "wacc": {
+      "type": "object",
+      "required": ["wacc"],
+      "properties": {
+        "wacc": {"type": "number", "description": "加权平均资本成本（小数）"}
+      }
+    },
+    "available_models": {
+      "type": "object",
+      "description": "各模型可用性检查结果"
+    },
+    "qualitative_adjustments": {
+      "type": "object",
+      "description": "Mode A 定性评估调整（仅完整模式）"
+    }
+  }
+}

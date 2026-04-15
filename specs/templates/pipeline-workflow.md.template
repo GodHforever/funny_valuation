@@ -1,0 +1,71 @@
+---
+name: {{workflow_name}}
+description: "{{workflow_description}}"
+---
+
+# {{workflow_title}}
+
+## 架构
+
+Pipeline 模式：单 Agent 按阶段顺序执行。
+
+## 输入参数
+
+| 参数 | 必须 | 默认值 | 说明 |
+|---|---|---|---|
+| {{param_name}} | {{required}} | {{default}} | {{description}} |
+
+## 触发方式
+{{trigger_description}}
+
+## 执行流程
+
+### Stage 0: 初始化
+- 创建 `data/{{primary_key}}/` 目录结构
+- 初始化 `data/{{primary_key}}/state.json`
+
+{{#stages}}
+### Stage {{stage_number}}: {{stage_name}}
+
+**组件：** {{component_skill}}
+**命令：**
+```bash
+{{command}}
+```
+
+**输入：** {{input_files}}
+**输出：** {{output_files}}
+
+**质量门：**
+```bash
+python scripts/validate_contract.py \
+  --schema specs/contracts/{{schema}}.json \
+  --data {{output_data_file}}
+```
+- 通过条件: {{pass_condition}}
+
+**失败策略：** {{failure_strategy}}
+**状态转换：** {{state_from}} → {{state_to}}
+{{/stages}}
+
+### Stage {{final}}: 结果呈现
+向用户呈现最终结果。
+
+## 状态机
+
+```
+init {{#stages}}→ stage{{n}}_running → stage{{n}}_validated {{/stages}}→ done
+```
+
+## 数据目录
+
+```
+data/{{primary_key}}/
+  state.json
+  {{#output_dirs}}
+  {{dir_name}}/
+  {{/output_dirs}}
+```
+
+## 断点续传
+读取 `data/{{primary_key}}/state.json` 的 `current_phase`，从最后完成的阶段之后继续。

@@ -1,0 +1,97 @@
+---
+name: {{workflow_name}}
+description: "{{workflow_description}}"
+---
+
+# {{workflow_title}}
+
+## 架构
+
+Lead+Workers 模式：
+- **Lead Agent**（workflow-lead）：管理状态机、分派任务、校验质量门
+- **Component Skills**：各阶段执行，均以 Mode B（协同）模式调用
+- **Reporter Agent**（workflow-reporter）：执行结束后自动审计
+
+## 输入参数
+
+| 参数 | 必须 | 默认值 | 说明 |
+|---|---|---|---|
+| {{param_name}} | {{required}} | {{default}} | {{description}} |
+
+## 触发方式
+{{trigger_description}}
+
+## 执行流程
+
+### Stage 0: 初始化
+- 创建 `data/{{primary_key}}/` 目录结构及子目录
+- 初始化 `data/{{primary_key}}/state.json`（参照 specs/contracts/workflow-state.json）
+- 验证输入参数
+
+**质量门：** 目录和 state.json 创建成功
+**失败策略：** 阻断
+
+{{#stages}}
+### Stage {{stage_number}}: {{stage_name}}
+
+**组件：** {{component_skill}}
+{{#parallel_subtasks}}
+**子任务 {{subtask_id}}（并行）：{{subtask_name}}**
+```bash
+{{command}}
+```
+输出: {{output}}
+{{/parallel_subtasks}}
+
+{{#serial_tasks}}
+**命令：**
+```bash
+{{command}}
+```
+{{/serial_tasks}}
+
+**输出：** {{output_files}}
+
+**质量门：**
+```bash
+python scripts/validate_contract.py \
+  --schema specs/contracts/{{schema}}.json \
+  --data {{output_data_file}}
+```
+- 通过条件: {{pass_condition}}
+
+**失败策略：** {{failure_strategy}}
+**状态转换：** {{state_from}} → stage{{n}}_running → stage{{n}}_validated
+{{/stages}}
+
+### Stage {{audit}}: 执行审计
+
+**组件：** workflow-reporter Agent
+**输入：** `data/{{primary_key}}/state.json` + 所有阶段产出
+**输出：** `data/{{primary_key}}/execution_audit_{{date}}.md`
+
+### Stage {{final}}: 结果呈现
+向用户呈现核心结论和审计发现。
+
+## 状态机
+
+```
+init {{#stages}}→ stage{{n}}_running → stage{{n}}_validated {{/stages}}→ audit_running → done
+
+每阶段可进入 {stage}_failed:
+{{#stages}}
+- stage{{n}}_failed: {{failure_description}}
+{{/stages}}
+```
+
+## 数据流图
+
+```
+{{data_flow_diagram}}
+```
+
+## 数据单位规范
+遵循 CLAUDE.md 中定义的单位和字段名规范。
+
+## 断点续传
+读取 `data/{{primary_key}}/state.json` 的 `current_phase`，从最后完成的阶段之后继续。

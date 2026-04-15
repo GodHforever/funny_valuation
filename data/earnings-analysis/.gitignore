@@ -1,8 +1,0 @@
-# 忽略所有分析文档和数据文件
-*.md
-*.json
-# 忽略按公司组织的子目录
-*/
-# 保留 .gitkeep 和 .gitignore
-!.gitkeep
-!.gitignore

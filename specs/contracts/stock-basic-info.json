@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Stock Basic Info",
+  "description": "股票基本信息 + 实时行情。所有工作流阶段共享的股票标识和行情快照。",
+  "type": "object",
+  "required": ["code", "name", "current_price", "total_market_cap", "pe_ttm", "pb_mrq", "status"],
+  "properties": {
+    "code": {"type": "string", "pattern": "^\\d{6}$", "description": "6位A股代码"},
+    "name": {"type": "string", "description": "股票名称"},
+    "industry": {"type": "string", "description": "所属行业"},
+    "current_price": {"type": ["number", "null"], "description": "当前股价（元）"},
+    "total_market_cap": {"type": ["number", "null"], "description": "总市值（亿元）"},
+    "circulating_market_cap": {"type": ["number", "null"], "description": "流通市值（亿元）"},
+    "total_shares": {"type": ["number", "null"], "description": "总股本（亿股）"},
+    "pe_ttm": {"type": ["number", "null"], "description": "市盈率TTM（倍）"},
+    "pb_mrq": {"type": ["number", "null"], "description": "市净率MRQ（倍）"},
+    "ps_ttm": {"type": ["number", "null"], "description": "市销率TTM（倍）"},
+    "eps_ttm": {"type": ["number", "null"], "description": "每股收益TTM（元）"},
+    "bvps": {"type": ["number", "null"], "description": "每股净资产（元）"},
+    "dividend_yield": {"type": ["number", "null"], "description": "股息率"},
+    "change_pct": {"type": ["number", "null"], "description": "涨跌幅(%)"},
+    "volume": {"type": ["number", "null"], "description": "成交量"},
+    "status": {"type": "string", "enum": ["success", "partial", "failed"], "description": "数据获取状态"}
+  }
+}

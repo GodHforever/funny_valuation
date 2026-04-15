@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Financial Statements",
+  "description": "统一的原始财务数据格式。data_fetcher 和 valuation_data 的输出都必须符合此契约。",
+  "type": "object",
+  "required": ["meta", "stock_info", "income_data", "balance_data", "cashflow_data"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["code", "timestamp"],
+      "properties": {
+        "code": {"type": "string"},
+        "name": {"type": "string"},
+        "timestamp": {"type": "string", "description": "数据获取时间 ISO8601"},
+        "source": {"type": "string", "description": "数据来源标识"},
+        "report_type": {"type": "string", "enum": ["annual", "half", "q1", "q3"]}
+      }
+    },
+    "stock_info": {
+      "type": "object",
+      "required": ["code", "name", "status"],
+      "description": "参考 stock-basic-info.json schema"
+    },
+    "income_data": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "annual_series": {
+          "type": "object",
+          "description": "按指标分组的年度序列，如 revenue: [{year, value}]"
+        },
+        "raw_records": {
+          "type": "array",
+          "description": "原始 API 返回记录（保留完整性）"
+        },
+        "status": {"type": "string", "enum": ["success", "partial", "failed"]}
+      }
+    },
+    "balance_data": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "latest": {"type": "object", "description": "最新一期资产负债数据"},
+        "annual_series": {"type": "object"},
+        "raw_records": {"type": "array"},
+        "status": {"type": "string", "enum": ["success", "partial", "failed"]}
+      }
+    },
+    "cashflow_data": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "annual_series": {"type": "object"},
+        "raw_records": {"type": "array"},
+        "status": {"type": "string", "enum": ["success", "partial", "failed"]}
+      }
+    },
+    "dividend_history": {
+      "type": "object",
+      "properties": {
+        "records": {"type": "array"},
+        "status": {"type": "string"}
+      }
+    },
+    "wacc_inputs": {
+      "type": "object",
+      "properties": {
+        "risk_free_rate": {"type": ["number", "null"]},
+        "market_risk_premium": {"type": ["number", "null"]},
+        "status": {"type": "string"}
+      }
+    }
+  }
+}
