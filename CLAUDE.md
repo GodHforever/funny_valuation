@@ -3,12 +3,14 @@
 ## 项目性质
 这是一个 Skill 编排仓库（非代码仓库）。核心产物是 SKILL.md 工作流定义和辅助 Python 脚本。
 
+最高法则：对于任何行业，股票的分析，必须充分获取调研真实数据，结合数据分析，而绝对不能主观臆测。
 ## 核心原则
 
-1. **数据契约是法律**：每阶段输出必须通过 `specs/contracts/` 下对应的 JSON Schema 校验，缺失 critical 字段则阻断流程。
-2. **单一数据源**：金融数据只获取一次，缓存在 `data/{stock_code}/market-data/`，下游阶段从缓存读取。
-3. **可审计性**：每次工作流执行产生 `data/{stock_code}/state.json` 追踪全流程状态。
-4. **双模式 Skill**：每个组件 Skill 支持独立运行（Mode A）和工作流协同运行（Mode B）。
+1. 个股的数据和分析结果必须组织在`data/{stock_code}/` 股票代码命名的文件夹下,不允许放置在其他位置。
+2. **数据契约是法律**：每阶段输出必须通过 `specs/contracts/` 下对应的 JSON Schema 校验，缺失 critical 字段则阻断流程。
+3. **单一数据源**：金融数据只获取一次，缓存在 `data/{stock_code}/market-data/`，下游阶段从缓存读取。
+4. **可审计性**：每次工作流执行产生 `data/{stock_code}/state.json` 追踪全流程状态。
+5. **双模式 Skill**：每个组件 Skill 支持独立运行（Mode A）和工作流协同运行（Mode B）。
 
 ## 字段名规范（强制）
 
