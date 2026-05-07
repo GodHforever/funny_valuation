@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "National Team Snapshot",
+  "description": "L1 当日实时 + 60 日成交额代理时序 + 最新已披露份额。日级份额无公开接口, 用日级成交额异常作为国家队动向代理信号。",
+  "type": "object",
+  "required": ["meta", "etfs", "status"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["pull_time", "report_date", "data_sources"],
+      "properties": {
+        "pull_time": {"type": "string", "description": "ISO8601"},
+        "report_date": {"type": "string", "description": "YYYY-MM-DD"},
+        "data_sources": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "etfs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["etf_code", "etf_name", "status"],
+        "properties": {
+          "etf_code": {"type": "string", "pattern": "^\\d{6}$"},
+          "etf_name": {"type": "string"},
+          "tracking_index": {"type": "string"},
+          "current_price": {"type": ["number", "null"], "description": "当前价(元)"},
+          "pre_close": {"type": ["number", "null"]},
+          "change_pct": {"type": ["number", "null"], "description": "涨跌幅(%)"},
+          "volume_lots": {"type": ["number", "null"], "description": "成交量(手)"},
+          "turnover_yi": {"type": ["number", "null"], "description": "今日成交额(亿元)"},
+          "turnover_60d_avg_yi": {"type": ["number", "null"], "description": "近 60 日均成交额(亿元)"},
+          "turnover_60d_std_yi": {"type": ["number", "null"], "description": "近 60 日成交额标准差"},
+          "turnover_zscore": {"type": ["number", "null"], "description": "今日 Z-Score = (今日 - 均值) / 标准差"},
+          "turnover_7d_sum_yi": {"type": ["number", "null"], "description": "近 7 日累计成交额"},
+          "turnover_30d_sum_yi": {"type": ["number", "null"], "description": "近 30 日累计成交额"},
+          "turnover_7d_vs_60d_ratio": {"type": ["number", "null"], "description": "近 7 日均 / 60 日均"},
+          "turnover_30d_vs_60d_ratio": {"type": ["number", "null"], "description": "近 30 日均 / 60 日均"},
+          "price_change_7d_pct": {"type": ["number", "null"], "description": "近 7 交易日价格变动(%)"},
+          "price_change_30d_pct": {"type": ["number", "null"], "description": "近 30 交易日价格变动(%)"},
+          "latest_share_yi": {"type": ["number", "null"], "description": "最新已披露总份额(亿份), 来自 fundf10 jbgk, 季度更新"},
+          "latest_net_assets_yi": {"type": ["number", "null"], "description": "最新已披露净资产(亿元)"},
+          "share_disclosure_date": {"type": ["string", "null"], "description": "份额披露截止日"},
+          "kline_series": {
+            "type": "array",
+            "description": "近 120 个交易日 K 线 (供 nt_signals 计算 5/30/90 日切片)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {"type": "string"},
+                "open": {"type": "number"},
+                "close": {"type": "number"},
+                "high": {"type": "number"},
+                "low": {"type": "number"},
+                "turnover_yi": {"type": "number"}
+              }
+            }
+          },
+          "status": {"type": "string", "enum": ["success", "partial", "failed"]},
+          "error": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "status": {"type": "string", "enum": ["success", "partial", "failed"]},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  }
+}

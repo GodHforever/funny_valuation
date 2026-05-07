@@ -1,0 +1,141 @@
+{
+  "_comment": "国家队主体词典。A 类: 平准型(择时信号源), B 类: 产业型(题材源, 不参与择时)。name_patterns 是正则, 用于在 datacenter API 返回的 HOLDER_NAME 字段做模糊匹配。",
+  "A_class_capital_market_stabilizer": {
+    "_description": "平准型国家队 — 操作宽基 ETF, 是市场底/顶信号的主要来源",
+    "huijin": {
+      "category": "A_huijin",
+      "display_name": "中央汇金系",
+      "primary_targets": ["宽基 ETF", "四大行个股"],
+      "name_patterns": [
+        "^中央汇金投资有限责任公司$",
+        "^中央汇金资产管理有限责任公司$"
+      ],
+      "search_names": [
+        "中央汇金投资有限责任公司",
+        "中央汇金资产管理有限责任公司"
+      ]
+    },
+    "zhengjin": {
+      "category": "A_zhengjin",
+      "display_name": "证金公司",
+      "primary_targets": ["2015 救市残留个股"],
+      "name_patterns": ["^中国证券金融股份有限公司$"],
+      "search_names": ["中国证券金融股份有限公司"]
+    },
+    "chengtong": {
+      "category": "A_chengtong",
+      "display_name": "中国诚通系",
+      "primary_targets": ["宽基/行业/主题 ETF", "央企混改"],
+      "name_patterns": [
+        "中国诚通控股集团",
+        "诚通金控",
+        "诚通持股"
+      ],
+      "search_names": [
+        "中国诚通控股集团有限公司",
+        "诚通金控投资有限公司"
+      ]
+    },
+    "guoxin": {
+      "category": "A_guoxin",
+      "display_name": "中国国新系",
+      "primary_targets": ["央企 ETF", "央企股"],
+      "name_patterns": [
+        "中国国新控股",
+        "国新投资",
+        "国新国证基金"
+      ],
+      "search_names": [
+        "中国国新控股有限责任公司",
+        "国新投资有限公司"
+      ]
+    },
+    "waiguanju": {
+      "category": "A_waiguanju",
+      "display_name": "国家外汇管理局系(梧桐树)",
+      "primary_targets": ["四大行", "长江电力等长期持仓"],
+      "name_patterns": [
+        "梧桐树投资平台",
+        "北京凤山投资",
+        "北京坤藤投资"
+      ],
+      "search_names": [
+        "梧桐树投资平台有限责任公司",
+        "北京凤山投资有限责任公司",
+        "北京坤藤投资有限责任公司"
+      ]
+    },
+    "shebao": {
+      "category": "A_shebao",
+      "display_name": "全国社保 + 基本养老",
+      "primary_targets": ["蓝筹+成长长期配置"],
+      "name_patterns": [
+        "全国社保基金.*组合",
+        "基本养老保险基金.*组合"
+      ],
+      "search_names": []
+    }
+  },
+  "B_class_industry_funds": {
+    "_description": "产业型国家队 — 操作个股, 锁定期 5-15 年, 不是择时信号, 仅作题材池",
+    "ic_fund_phase1": {
+      "category": "B_industry",
+      "display_name": "国家集成电路产业投资基金一期",
+      "established": "2014-09",
+      "scale_yi": 987,
+      "name_patterns": ["国家集成电路产业投资基金股份有限公司"],
+      "search_names": ["国家集成电路产业投资基金股份有限公司"]
+    },
+    "ic_fund_phase2": {
+      "category": "B_industry",
+      "display_name": "国家集成电路产业投资基金二期",
+      "established": "2019-10",
+      "scale_yi": 2041,
+      "name_patterns": ["国家集成电路产业投资基金二期股份有限公司"],
+      "search_names": ["国家集成电路产业投资基金二期股份有限公司"]
+    },
+    "ic_fund_phase3": {
+      "category": "B_industry",
+      "display_name": "国家集成电路产业投资基金三期",
+      "established": "2024-05",
+      "scale_yi": 3440,
+      "name_patterns": [
+        "国家集成电路产业投资基金三期",
+        "华芯鼎新",
+        "国投集新"
+      ],
+      "search_names": [
+        "国家集成电路产业投资基金三期股份有限公司"
+      ]
+    },
+    "manufacturing_upgrade": {
+      "category": "B_industry",
+      "display_name": "国家制造业转型升级基金",
+      "name_patterns": ["国家制造业转型升级基金"],
+      "search_names": ["国家制造业转型升级基金股份有限公司"]
+    },
+    "green_dev": {
+      "category": "B_industry",
+      "display_name": "国家绿色发展基金",
+      "name_patterns": ["国家绿色发展基金"],
+      "search_names": ["国家绿色发展基金股份有限公司"]
+    },
+    "sme_dev": {
+      "category": "B_industry",
+      "display_name": "国家中小企业发展基金",
+      "name_patterns": ["国家中小企业发展基金"],
+      "search_names": ["国家中小企业发展基金有限公司"]
+    },
+    "soe_reform": {
+      "category": "B_industry",
+      "display_name": "中国国有企业混改基金(诚通)",
+      "name_patterns": ["中国国有企业混合所有制改革", "国有企业结构调整基金"],
+      "search_names": ["中国国有企业结构调整基金股份有限公司"]
+    }
+  },
+  "_exclude_patterns": [
+    "^香港中央结算",
+    "^HKSCC NOMINEES"
+  ],
+  "_exclude_reason": "沪深股通(香港中央结算)不是国家队, 但常被混淆"
+}

@@ -57,6 +57,23 @@ data/{stock_code}/   # 执行产物（按股票代码组织，不入 Git）
   valuation-reports/ # Stage 5 产物
 ```
 
+### 目录结构特例
+
+非个股工作流的数据按"功能命名"而非股票代码组织, 在 `data/` 下与 `{stock_code}/` 同级:
+
+```
+data/national-team/                # 国家队动向追踪 (national-team-tracker workflow)
+  state.json                       # 工作流状态
+  reports/{YYYY-MM-DD}/            # 每次执行归档
+    snapshot.json                  # Stage 1
+    seasonal.json                  # Stage 2
+    signal.json                    # Stage 3
+    national-team-report.md        # Stage 4 主报告
+    charts/*.png                   # 图表 (matplotlib 可用时)
+```
+
+判定原则: 若分析对象**不是单只股票**而是**全市场或某主体**, 则用功能命名目录。新增此类目录需在 CLAUDE.md 声明。
+
 ## 禁止模式
 
 - 禁止获取已缓存在 `data/{code}/market-data/` 中的 API 数据

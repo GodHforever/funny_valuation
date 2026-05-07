@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "National Team Seasonal Data",
+  "description": "L3 季度数据: ETF 季度规模时序 + 持有人结构 + 国家队主体反查 + 历史快照拼接",
+  "type": "object",
+  "required": ["meta", "etf_seasonal", "holders_holdings", "status"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["pull_time", "report_date"],
+      "properties": {
+        "pull_time": {"type": "string"},
+        "report_date": {"type": "string"}
+      }
+    },
+    "etf_seasonal": {
+      "type": "array",
+      "description": "每只 ETF 的最近 N 季度数据",
+      "items": {
+        "type": "object",
+        "required": ["etf_code", "quarters", "status"],
+        "properties": {
+          "etf_code": {"type": "string", "pattern": "^\\d{6}$"},
+          "etf_name": {"type": "string"},
+          "quarters": {
+            "type": "array",
+            "description": "最近 5 个季度",
+            "items": {
+              "type": "object",
+              "properties": {
+                "report_date": {"type": "string", "description": "YYYY-MM-DD 季报披露日"},
+                "purchase_yi": {"type": ["number", "null"], "description": "期间申购(亿份)"},
+                "redeem_yi": {"type": ["number", "null"], "description": "期间赎回(亿份)"},
+                "net_purchase_yi": {"type": ["number", "null"], "description": "净申购(亿份)"},
+                "total_share_yi": {"type": ["number", "null"], "description": "期末总份额(亿份)"},
+                "net_assets_yi": {"type": ["number", "null"], "description": "期末净资产(亿元)"},
+                "nav_change_pct": {"type": ["number", "null"], "description": "净资产变动率(%)"}
+              }
+            }
+          },
+          "holder_structure": {
+            "type": "array",
+            "description": "持有人结构(半年披露)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "report_date": {"type": "string"},
+                "institutional_pct": {"type": ["number", "null"], "description": "机构持有比例(%)"},
+                "individual_pct": {"type": ["number", "null"]},
+                "internal_pct": {"type": ["number", "null"]}
+              }
+            }
+          },
+          "status": {"type": "string", "enum": ["success", "partial", "failed"]},
+          "error": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "holders_holdings": {
+      "type": "array",
+      "description": "国家队主体反查: 每个主体当前所有 A 股持仓",
+      "items": {
+        "type": "object",
+        "required": ["holder_name", "holder_category", "status"],
+        "properties": {
+          "holder_name": {"type": "string", "description": "主体规范名"},
+          "holder_category": {"type": "string", "enum": ["A_huijin", "A_zhengjin", "A_chengtong", "A_guoxin", "A_waiguanju", "A_shebao", "A_other", "B_industry"]},
+          "latest_report_date": {"type": ["string", "null"]},
+          "stocks_count": {"type": "integer", "description": "当前持仓股票数量"},
+          "stocks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stock_code": {"type": "string"},
+                "stock_name": {"type": "string"},
+                "hold_num": {"type": "number", "description": "持仓股数"},
+                "hold_ratio": {"type": ["number", "null"], "description": "持股比例(%)"},
+                "holder_state": {"type": ["string", "null"], "description": "新进/加仓/减仓/不变/退出"},
+                "report_date": {"type": "string"}
+              }
+            }
+          },
+          "status": {"type": "string", "enum": ["success", "partial", "failed"]},
+          "error": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "history_window": {
+      "type": "object",
+      "description": "[已弃用] 原 snapshots 拼接, 因日级份额无公开接口已移除。保留字段为兼容性。",
+      "properties": {
+        "available_dates": {"type": "array", "items": {"type": "string"}},
+        "etfs_history": {"type": "array"}
+      }
+    },
+    "status": {"type": "string", "enum": ["success", "partial", "failed"]},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  }
+}

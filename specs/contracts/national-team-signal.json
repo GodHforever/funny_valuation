@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "National Team Signal & Recommendation",
+  "description": "Stage 3 综合信号: 5 级分级 + 多窗口变化 + 主体级聚合 + 操作建议",
+  "type": "object",
+  "required": ["meta", "etf_signals", "aggregate", "recommendation", "status"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["analysis_time", "report_date"],
+      "properties": {
+        "analysis_time": {"type": "string"},
+        "report_date": {"type": "string"}
+      }
+    },
+    "etf_signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["etf_code", "etf_name", "signal_level"],
+        "properties": {
+          "etf_code": {"type": "string"},
+          "etf_name": {"type": "string"},
+          "tracking_index": {"type": "string"},
+          "current_price": {"type": ["number", "null"]},
+          "change_pct": {"type": ["number", "null"]},
+          "windows": {
+            "type": "object",
+            "description": "各时间窗口的份额变动",
+            "properties": {
+              "d1": {"$ref": "#/definitions/windowChange"},
+              "d7": {"$ref": "#/definitions/windowChange"},
+              "d30": {"$ref": "#/definitions/windowChange"},
+              "quarter": {"$ref": "#/definitions/windowChange"}
+            }
+          },
+          "recent_windows": {
+            "type": "object",
+            "description": "近 5/30/90 日详细切片 (基于 K 线计算, 含峰值 Z 日)",
+            "properties": {
+              "d5": {"$ref": "#/definitions/recentWindow"},
+              "d30": {"$ref": "#/definitions/recentWindow"},
+              "d90": {"$ref": "#/definitions/recentWindow"}
+            }
+          },
+          "turnover_zscore": {"type": ["number", "null"], "description": "今日成交额相对 60 日 Z-Score"},
+          "institutional_pct_latest": {"type": ["number", "null"]},
+          "institutional_pct_change_pp": {"type": ["number", "null"], "description": "机构占比环比变化(pp)"},
+          "signal_level": {"type": "string", "enum": ["red_strong_buy", "orange_buy", "yellow_neutral", "purple_top_warning", "black_strong_sell", "blue_industry"]},
+          "signal_reasons": {"type": "array", "items": {"type": "string"}, "description": "触发该等级的具体规则"}
+        }
+      }
+    },
+    "aggregate": {
+      "type": "object",
+      "description": "全市场 / 主体级聚合",
+      "properties": {
+        "broad_etfs_share_change_d1_yi": {"type": "number", "description": "宽基 ETF 池今日总份额合计变动(亿份)"},
+        "broad_etfs_share_change_d7_yi": {"type": ["number", "null"]},
+        "broad_etfs_share_change_d30_yi": {"type": ["number", "null"]},
+        "etfs_buying_count": {"type": "integer", "description": "今日净申购的 ETF 数量"},
+        "etfs_selling_count": {"type": "integer", "description": "今日净赎回的 ETF 数量"},
+        "holders_summary": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "holder_name": {"type": "string"},
+              "stocks_count": {"type": "integer"},
+              "trend": {"type": "string", "enum": ["accumulating", "trimming", "stable", "unknown"]},
+              "trend_evidence": {"type": "string"}
+            }
+          }
+        },
+        "industry_funds_pool_count": {"type": "integer", "description": "B 类产业基金题材池规模"}
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "required": ["overall_level", "headline", "actions"],
+      "properties": {
+        "overall_level": {"type": "string", "enum": ["red_strong_buy", "orange_buy", "yellow_neutral", "purple_top_warning", "black_strong_sell"]},
+        "headline": {"type": "string", "description": "一句话核心判断"},
+        "actions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "具体操作建议 3-5 条"
+        },
+        "risks": {"type": "array", "items": {"type": "string"}},
+        "industry_pool_highlights": {"type": "array", "items": {"type": "string"}, "description": "B 类题材池更新提示"}
+      }
+    },
+    "status": {"type": "string", "enum": ["success", "partial", "failed"]},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  },
+  "definitions": {
+    "windowChange": {
+      "type": "object",
+      "properties": {
+        "share_change_yi": {"type": ["number", "null"], "description": "份额变动(亿份)"},
+        "share_change_pct": {"type": ["number", "null"], "description": "份额变动率(%)"},
+        "is_estimated": {"type": "boolean", "default": false, "description": "true 表示由季度数据估算, false 表示来自快照求差"},
+        "data_source": {"type": "string", "enum": ["snapshot_diff", "quarter_estimate", "lijisilu_amount_incr", "fundf10_quarter", "n/a"]},
+        "note": {"type": ["string", "null"]}
+      }
+    },
+    "recentWindow": {
+      "type": "object",
+      "description": "近 N 日切片 (基于 K 线)",
+      "properties": {
+        "n_days": {"type": "integer"},
+        "turnover_sum_yi": {"type": ["number", "null"]},
+        "turnover_avg_yi": {"type": ["number", "null"]},
+        "vs_60d_ratio": {"type": ["number", "null"], "description": "窗口日均成交 / 60 日均"},
+        "price_change_pct": {"type": ["number", "null"]},
+        "price_high": {"type": ["number", "null"]},
+        "price_low": {"type": ["number", "null"]},
+        "max_zscore_day": {
+          "type": ["object", "null"],
+          "description": "窗口内 Z-Score 最高的那一天 (识别国家队动作触发日)",
+          "properties": {
+            "date": {"type": "string"},
+            "z": {"type": "number"},
+            "turnover_yi": {"type": "number"},
+            "close": {"type": "number"}
+          }
+        },
+        "start_date": {"type": "string"},
+        "end_date": {"type": "string"}
+      }
+    }
+  }
+}

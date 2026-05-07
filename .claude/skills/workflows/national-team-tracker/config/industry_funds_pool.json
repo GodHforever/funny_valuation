@@ -1,0 +1,46 @@
+{
+  "_comment": "B 类产业基金的'被投上市公司池'。基于 2024-2025 公开新闻整理, 用于'题材标的池'输出。这不是择时信号, 锁定期 5-15 年, 仅供长线主题配置参考。需定期手动更新。",
+  "ic_semiconductor": {
+    "_description": "国家集成电路产业投资基金一/二/三期的上市公司持仓",
+    "wafer_fab": [
+      {"code": "688981", "name": "中芯国际", "category": "晶圆代工"},
+      {"code": "688347", "name": "华虹公司", "category": "晶圆代工"},
+      {"code": "600460", "name": "士兰微", "category": "功率半导体IDM"},
+      {"code": "688396", "name": "华润微", "category": "功率半导体IDM"}
+    ],
+    "design": [
+      {"code": "300672", "name": "国科微", "category": "数字芯片"},
+      {"code": "300474", "name": "景嘉微", "category": "数字芯片"},
+      {"code": "688508", "name": "芯朋微", "category": "功率半导体"},
+      {"code": "688262", "name": "国芯科技", "category": "CPU"},
+      {"code": "603893", "name": "瑞芯微", "category": "SoC"},
+      {"code": "688107", "name": "安路科技", "category": "FPGA"}
+    ],
+    "package_test": [
+      {"code": "600584", "name": "长电科技", "category": "封测龙头"},
+      {"code": "002156", "name": "通富微电", "category": "封测"},
+      {"code": "002185", "name": "华天科技", "category": "封测"}
+    ],
+    "equipment": [
+      {"code": "002371", "name": "北方华创", "category": "全品类设备"},
+      {"code": "688012", "name": "中微公司", "category": "刻蚀设备"},
+      {"code": "300604", "name": "长川科技", "category": "测试设备"},
+      {"code": "688072", "name": "拓荆科技", "category": "薄膜沉积/键合(三期重点)"},
+      {"code": "300567", "name": "精测电子", "category": "检测设备"},
+      {"code": "688120", "name": "华海清科", "category": "CMP设备"},
+      {"code": "688630", "name": "芯碁微装", "category": "光刻"}
+    ],
+    "materials": [
+      {"code": "688126", "name": "沪硅产业", "category": "硅片"},
+      {"code": "688019", "name": "安集科技", "category": "抛光液"},
+      {"code": "002409", "name": "雅克科技", "category": "光刻胶"},
+      {"code": "300655", "name": "晶瑞电材", "category": "光刻胶"},
+      {"code": "603650", "name": "彤程新材", "category": "光刻胶(三期潜力)"},
+      {"code": "300236", "name": "上海新阳", "category": "光刻胶"},
+      {"code": "002916", "name": "深南电路", "category": "IC载板"}
+    ]
+  },
+  "_last_updated": "2026-04-19",
+  "_update_method": "基于新浪财经/国际电子商情等公开新闻整理, 重点跟踪大基金三期(华芯鼎新/国投集新)新增公告",
+  "_signal_usage": "'蓝色信号'触发条件: 当 B 类基金通过公告新增/增持某只公司时, 输出到 recommendation.industry_pool_highlights"
+}

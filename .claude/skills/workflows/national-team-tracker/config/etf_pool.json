@@ -1,0 +1,28 @@
+{
+  "_comment": "国家队跟踪 ETF 池。基于 2023-2026 汇金/诚通/国新公开持仓筛选。secid 前缀: 1=上交所(60/68/5), 0=深交所(0/3/1)。可在 SKILL 调用时通过 --extra-etfs 追加。",
+  "broad_index_etfs": [
+    {"code": "510300", "secid": "1.510300", "name": "沪深300ETF华泰柏瑞", "tracking_index": "沪深300", "issuer": "华泰柏瑞", "is_core": true},
+    {"code": "510330", "secid": "1.510330", "name": "沪深300ETF华夏",   "tracking_index": "沪深300", "issuer": "华夏",     "is_core": true},
+    {"code": "510310", "secid": "1.510310", "name": "沪深300ETF易方达", "tracking_index": "沪深300", "issuer": "易方达",   "is_core": true},
+    {"code": "159919", "secid": "0.159919", "name": "沪深300ETF嘉实",   "tracking_index": "沪深300", "issuer": "嘉实",     "is_core": false},
+    {"code": "510050", "secid": "1.510050", "name": "上证50ETF华夏",    "tracking_index": "上证50",  "issuer": "华夏",     "is_core": true},
+    {"code": "510850", "secid": "1.510850", "name": "上证50ETF工银",    "tracking_index": "上证50",  "issuer": "工银",     "is_core": false},
+    {"code": "510500", "secid": "1.510500", "name": "中证500ETF南方",   "tracking_index": "中证500", "issuer": "南方",     "is_core": true},
+    {"code": "159922", "secid": "0.159922", "name": "中证500ETF嘉实",   "tracking_index": "中证500", "issuer": "嘉实",     "is_core": false},
+    {"code": "512100", "secid": "1.512100", "name": "中证1000ETF南方",  "tracking_index": "中证1000","issuer": "南方",     "is_core": true},
+    {"code": "159845", "secid": "0.159845", "name": "中证1000ETF华夏",  "tracking_index": "中证1000","issuer": "华夏",     "is_core": false},
+    {"code": "512880", "secid": "1.512880", "name": "证券ETF",         "tracking_index": "中证全指证券公司", "issuer": "国泰", "is_core": false}
+  ],
+  "growth_etfs": [
+    {"code": "159915", "secid": "0.159915", "name": "创业板ETF易方达",  "tracking_index": "创业板指", "issuer": "易方达", "is_core": true},
+    {"code": "159952", "secid": "0.159952", "name": "创业板ETF广发",    "tracking_index": "创业板指", "issuer": "广发",   "is_core": false},
+    {"code": "588000", "secid": "1.588000", "name": "科创50ETF华夏",    "tracking_index": "科创50",  "issuer": "华夏",   "is_core": true},
+    {"code": "588080", "secid": "1.588080", "name": "科创50ETF易方达",  "tracking_index": "科创50",  "issuer": "易方达", "is_core": false}
+  ],
+  "_default_pool": ["510300", "510330", "510050", "510500", "512100", "159915", "588000", "510850"],
+  "_notes": [
+    "_default_pool 是 SKILL 默认追踪的 8 只核心宽基, 覆盖汇金 2025 年中持仓的主要标的",
+    "is_core=true 的 ETF 在 2024-2025 季报中被汇金/诚通/国新合计持有比例超过 50%",
+    "如需追加, 在 SKILL 调用时传 --extra-etfs 510310,510850 即可"
+  ]
+}

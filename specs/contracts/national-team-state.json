@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "National Team Workflow State",
+  "description": "国家队追踪工作流执行状态。每次执行产生一个 state.json (data/national-team/state.json)。",
+  "type": "object",
+  "required": ["workflow", "report_date", "started_at", "current_phase", "stages"],
+  "properties": {
+    "workflow": {"type": "string", "const": "national-team-tracker"},
+    "report_date": {"type": "string", "description": "报告归属日期 YYYY-MM-DD (T-1 或当日)"},
+    "started_at": {"type": "string", "description": "ISO8601"},
+    "completed_at": {"type": ["string", "null"]},
+    "current_phase": {"type": "string", "enum": ["init", "stage1_running", "stage1_passed", "stage2_running", "stage2_passed", "stage2_partial", "stage3_running", "stage3_passed", "stage4_running", "completed", "stage1_failed", "stage2_failed", "stage3_failed", "stage4_failed"]},
+    "overall_status": {"type": "string", "enum": ["running", "completed", "failed", "blocked"]},
+    "analysis_scope": {
+      "type": "object",
+      "description": "本次分析覆盖范围",
+      "properties": {
+        "etf_codes": {"type": "array", "items": {"type": "string"}, "description": "追踪的 ETF 代码列表"},
+        "time_windows": {"type": "array", "items": {"type": "string"}, "description": "如 ['1d', '7d', '30d', 'quarter']"},
+        "holders_filter": {"type": "string", "default": "all"}
+      }
+    },
+    "env_config": {
+      "type": "object",
+      "description": "运行时环境探测结果",
+      "properties": {
+        "python_path": {"type": "string"},
+        "akshare_available": {"type": "boolean"},
+        "matplotlib_available": {"type": "boolean"},
+        "pandas_available": {"type": "boolean"},
+        "env_md_loaded": {"type": "boolean"}
+      }
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {"type": "string", "enum": ["pending", "running", "passed", "partial", "failed", "skipped"]},
+          "started_at": {"type": ["string", "null"]},
+          "completed_at": {"type": ["string", "null"]},
+          "input_files": {"type": "array", "items": {"type": "string"}},
+          "output_files": {"type": "array", "items": {"type": "string"}},
+          "validation": {
+            "type": "object",
+            "properties": {
+              "schema": {"type": "string"},
+              "result": {"type": "string", "enum": ["pass", "warn", "fail", "skip"]},
+              "errors": {"type": "array", "items": {"type": "string"}},
+              "warnings": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "errors": {"type": "array", "items": {"type": "string"}},
+          "duration_seconds": {"type": ["number", "null"]}
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage": {"type": "string"},
+          "severity": {"type": "string", "enum": ["critical", "warning", "info"]},
+          "message": {"type": "string"},
+          "timestamp": {"type": "string"}
+        }
+      }
+    }
+  }
+}
