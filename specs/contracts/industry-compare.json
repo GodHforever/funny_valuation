@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Industry Compare",
+  "description": "同行业公司对比分析输出。包含行业排名、可比公司选取和相对估值。",
+  "type": "object",
+  "required": ["code", "name", "industry_name", "analysis_date", "peer_count", "rankings", "status"],
+  "properties": {
+    "code": {"type": "string", "pattern": "^\\d{6}$", "description": "6位A股代码"},
+    "name": {"type": "string", "description": "股票名称"},
+    "industry_name": {"type": "string", "description": "所属行业名称（申万分类）"},
+    "industry_code": {"type": "string", "description": "行业代码"},
+    "analysis_date": {"type": "string", "description": "分析日期 ISO8601"},
+    "peer_count": {"type": "integer", "description": "同行业公司总数"},
+    "rankings": {
+      "type": "array",
+      "description": "各指标排名",
+      "items": {
+        "type": "object",
+        "required": ["metric", "value", "rank", "total", "percentile"],
+        "properties": {
+          "metric": {"type": "string", "description": "指标名称（如 total_market_cap, pe_ttm, pb_mrq, roe, revenue_growth, net_profit_growth）"},
+          "value": {"type": ["number", "null"], "description": "当前值"},
+          "unit": {"type": "string", "description": "单位"},
+          "rank": {"type": "integer", "description": "排名（1为最优）"},
+          "total": {"type": "integer", "description": "参与排名的总公司数"},
+          "percentile": {"type": ["number", "null"], "description": "分位数（0-100）"}
+        }
+      }
+    },
+    "comparable_companies": {
+      "type": "array",
+      "description": "选取的可比公司（3-5家）",
+      "items": {
+        "type": "object",
+        "required": ["code", "name"],
+        "properties": {
+          "code": {"type": "string"},
+          "name": {"type": "string"},
+          "total_market_cap": {"type": ["number", "null"], "description": "总市值（亿元）"},
+          "pe_ttm": {"type": ["number", "null"], "description": "PE(TTM)（倍）"},
+          "pb_mrq": {"type": ["number", "null"], "description": "PB(MRQ)（倍）"},
+          "roe": {"type": ["number", "null"], "description": "ROE（%）"},
+          "revenue_growth": {"type": ["number", "null"], "description": "营收增速（%）"},
+          "net_profit_growth": {"type": ["number", "null"], "description": "净利增速（%）"},
+          "selection_reason": {"type": "string", "description": "选取理由"}
+        }
+      }
+    },
+    "valuation_by_peers": {
+      "type": "object",
+      "description": "可比公司估值法结果",
+      "properties": {
+        "peer_avg_pe": {"type": ["number", "null"], "description": "可比公司平均 PE（倍）"},
+        "peer_avg_pb": {"type": ["number", "null"], "description": "可比公司平均 PB（倍）"},
+        "implied_price_by_pe": {"type": ["number", "null"], "description": "PE法隐含股价（元）"},
+        "implied_price_by_pb": {"type": ["number", "null"], "description": "PB法隐含股价（元）"},
+        "premium_discount_pe": {"type": ["number", "null"], "description": "PE 溢价/折价率（%）"},
+        "premium_discount_pb": {"type": ["number", "null"], "description": "PB 溢价/折价率（%）"}
+      }
+    },
+    "status": {"type": "string", "enum": ["success", "partial", "failed"], "description": "分析状态"}
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Risk Scan",
+  "description": "个股风险快速扫描结果。15项风险指标检测，含红/橙/绿三级告警。",
+  "type": "object",
+  "required": ["code", "name", "scan_date", "overall_risk_level", "items", "summary", "status"],
+  "properties": {
+    "code": {"type": "string", "pattern": "^\\d{6}$", "description": "6位A股代码"},
+    "name": {"type": "string", "description": "股票名称"},
+    "scan_date": {"type": "string", "description": "扫描日期 ISO8601"},
+    "overall_risk_level": {
+      "type": "string",
+      "enum": ["低风险", "中风险", "高风险", "极高风险"],
+      "description": "综合风险评级"
+    },
+    "items": {
+      "type": "array",
+      "description": "15项风险检测结果",
+      "items": {
+        "type": "object",
+        "required": ["category", "check_name", "alert_level"],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["财务", "治理", "市场", "合规", "集中度", "估值"],
+            "description": "风险类别"
+          },
+          "check_name": {"type": "string", "description": "检测项名称"},
+          "alert_level": {
+            "type": "string",
+            "enum": ["red", "orange", "green"],
+            "description": "告警级别：red=红色警告, orange=橙色警告, green=正常"
+          },
+          "value": {"type": ["number", "string", "null"], "description": "检测值"},
+          "threshold": {"type": ["number", "string", "null"], "description": "阈值"},
+          "description": {"type": "string", "description": "检测结果说明"},
+          "data_source": {"type": "string", "description": "数据来源"}
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["red_count", "orange_count", "green_count"],
+      "properties": {
+        "red_count": {"type": "integer", "description": "红色警告数"},
+        "orange_count": {"type": "integer", "description": "橙色警告数"},
+        "green_count": {"type": "integer", "description": "正常项数"}
+      }
+    },
+    "status": {"type": "string", "enum": ["success", "partial", "failed"], "description": "扫描状态"}
+  }
+}

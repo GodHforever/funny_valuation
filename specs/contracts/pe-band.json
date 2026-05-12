@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PE Band Analysis",
+  "description": "历史估值分位数分析输出。包含 PE/PB/PS 的历史区间、当前分位数和估值判定。",
+  "type": "object",
+  "required": ["code", "name", "analysis_date", "period_years", "pe_band", "data_points", "status"],
+  "properties": {
+    "code": {"type": "string", "pattern": "^\\d{6}$", "description": "6位A股代码"},
+    "name": {"type": "string", "description": "股票名称"},
+    "analysis_date": {"type": "string", "description": "分析日期 ISO8601"},
+    "period_years": {"type": "integer", "description": "分析年限（3/5/10）"},
+    "pe_band": {
+      "type": "object",
+      "required": ["current", "min", "max", "median", "mean", "percentile", "verdict"],
+      "properties": {
+        "current": {"type": ["number", "null"], "description": "当前 PE(TTM)（倍）"},
+        "min": {"type": ["number", "null"], "description": "历史最低 PE"},
+        "max": {"type": ["number", "null"], "description": "历史最高 PE"},
+        "median": {"type": ["number", "null"], "description": "历史中位数 PE"},
+        "mean": {"type": ["number", "null"], "description": "历史均值 PE"},
+        "std": {"type": ["number", "null"], "description": "历史标准差"},
+        "percentile": {"type": ["number", "null"], "description": "当前分位数（0-100）"},
+        "verdict": {
+          "type": "string",
+          "enum": ["极度低估", "低估", "合理", "高估", "极度高估"],
+          "description": "估值判定"
+        },
+        "data_source": {"type": "string", "description": "数据来源标识"}
+      }
+    },
+    "pb_band": {
+      "type": "object",
+      "properties": {
+        "current": {"type": ["number", "null"], "description": "当前 PB(MRQ)（倍）"},
+        "min": {"type": ["number", "null"]},
+        "max": {"type": ["number", "null"]},
+        "median": {"type": ["number", "null"]},
+        "mean": {"type": ["number", "null"]},
+        "std": {"type": ["number", "null"]},
+        "percentile": {"type": ["number", "null"]},
+        "verdict": {
+          "type": "string",
+          "enum": ["极度低估", "低估", "合理", "高估", "极度高估"]
+        },
+        "data_source": {"type": "string"}
+      }
+    },
+    "ps_band": {
+      "type": "object",
+      "properties": {
+        "current": {"type": ["number", "null"], "description": "当前 PS(TTM)（倍）"},
+        "min": {"type": ["number", "null"]},
+        "max": {"type": ["number", "null"]},
+        "median": {"type": ["number", "null"]},
+        "mean": {"type": ["number", "null"]},
+        "std": {"type": ["number", "null"]},
+        "percentile": {"type": ["number", "null"]},
+        "verdict": {
+          "type": "string",
+          "enum": ["极度低估", "低估", "合理", "高估", "极度高估"]
+        },
+        "data_source": {"type": "string"}
+      }
+    },
+    "data_points": {"type": "integer", "description": "历史数据点数量"},
+    "status": {"type": "string", "enum": ["success", "partial", "failed"], "description": "分析状态"}
+  }
+}

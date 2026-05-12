@@ -19,3 +19,8 @@ Thumbs.db
 
 # Data directories — 按股票代码组织的执行产物，不入 Git
 data/*/
+
+# 已清理的临时目录（防止重建）
+build_view/
+prompts/
+result_docs/

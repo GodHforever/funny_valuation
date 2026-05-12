@@ -162,7 +162,16 @@ npx ticker-cli recommendations {代码}
 
 ### 第三层：行业与竞争格局
 
-**数据来源：** data_fetcher.py 行业对比数据 + 用户提供的业务描述
+**数据来源：** data_fetcher.py 行业对比数据 + 用户提供的业务描述 + industry-compare Skill 自动对比
+
+> **增强提示：** 建议在此层自动调用 `industry-compare` Skill 获取行业排名和可比公司数据，为定性分析提供定量支撑。
+>
+> ```bash
+> python .claude/skills/components/industry-compare/scripts/industry_compare.py \
+>   --code {code} --format json --mode collaborative \
+>   --output-dir data/{code}/analysis/
+> ```
+> 输出的 `{code}_industry_compare.json` 可直接用于竞争坐标分析。
 
 **分析要点：**
 

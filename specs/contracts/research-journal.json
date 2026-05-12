@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Research Journal Entry",
+  "description": "研究过程日志条目。JSONL 格式，每行一条记录，追踪完整研究过程。",
+  "type": "object",
+  "required": ["type", "timestamp"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["init", "skill_start", "skill_end", "quality_gate", "analysis", "done"],
+      "description": "日志类型"
+    },
+    "timestamp": {"type": "string", "description": "ISO8601 时间戳"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"type": {"const": "init"}}},
+      "then": {
+        "required": ["query", "agent"],
+        "properties": {
+          "query": {"type": "string", "description": "用户原始查询"},
+          "agent": {"type": "string", "description": "执行 Agent 标识"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"type": {"const": "skill_start"}}},
+      "then": {
+        "required": ["skill"],
+        "properties": {
+          "skill": {"type": "string", "description": "Skill 名称"},
+          "args": {"type": "object", "description": "调用参数"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"type": {"const": "skill_end"}}},
+      "then": {
+        "required": ["skill", "status"],
+        "properties": {
+          "skill": {"type": "string", "description": "Skill 名称"},
+          "status": {"type": "string", "enum": ["success", "partial", "failed"]},
+          "output": {"type": "string", "description": "输出文件路径"},
+          "duration_ms": {"type": "integer", "description": "执行耗时（毫秒）"},
+          "error": {"type": "string", "description": "错误信息（失败时）"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"type": {"const": "quality_gate"}}},
+      "then": {
+        "required": ["schema", "result"],
+        "properties": {
+          "schema": {"type": "string", "description": "校验使用的 schema 名称"},
+          "result": {"type": "string", "enum": ["pass", "warn", "fail"]},
+          "errors": {"type": "array", "items": {"type": "string"}},
+          "warnings": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"type": {"const": "analysis"}}},
+      "then": {
+        "required": ["layer", "summary"],
+        "properties": {
+          "layer": {"type": "string", "description": "分析层级标识"},
+          "summary": {"type": "string", "description": "分析摘要"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"type": {"const": "done"}}},
+      "then": {
+        "required": ["report"],
+        "properties": {
+          "report": {"type": "string", "description": "最终报告文件路径"},
+          "total_duration_ms": {"type": "integer", "description": "总耗时（毫秒）"},
+          "skills_called": {"type": "integer", "description": "调用 Skill 总数"}
+        }
+      }
+    }
+  ]
+}
